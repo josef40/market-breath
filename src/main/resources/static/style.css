@@ -1,0 +1,133 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    color-scheme: dark;
+
+    --primary: #22c55e;
+    --accent: #4ade80;
+    --background: #0f172a;
+    --surface: #1e293b;
+    --hover: #243247;
+    --color: #e2e8f0;
+    --border: #334155;
+    --up: #22c55e;
+    --down: #ef4444;
+    --font: "Inter", sans-serif;
+    --spacing: 2rem;
+}
+
+body {
+    font-family: var(--font);
+    background-color: var(--background);
+    color: var(--color);
+    min-height: 100dvh;
+}
+
+main {
+    padding: var(--spacing);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing);
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+}
+
+button {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--background);
+    background-color: var(--primary);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--accent);
+}
+
+button:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+}
+
+#marketTable {
+    width: 100%;
+    max-width: 50rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    font-variant-numeric: tabular-nums;
+}
+
+#marketTable th,
+#marketTable td {
+    padding: 0.75rem 1rem;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+#marketTable th:last-child,
+#marketTable td:last-child {
+    border-right: none;
+}
+
+#marketTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+#marketTable thead {
+    background-color: var(--surface);
+}
+
+#marketTable tbody tr:hover {
+    background-color: var(--hover);
+}
+
+#marketTable td.cells {
+    padding: 0;
+}
+
+.boxes {
+    display: flex;
+}
+
+.box {
+    flex: 1;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background-color: var(--surface);
+    color: var(--color);
+}
+
+.box+.box {
+    border-left: 1px solid var(--background);
+}
+
+.box.up {
+    background-color: var(--up);
+    color: var(--background);
+}
+
+.box.down {
+    background-color: var(--down);
+    color: var(--background);
+}

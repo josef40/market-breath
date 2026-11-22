@@ -1,4 +1,4 @@
-package com.josef.marketbreath.repo;
+package com.josef.marketbreath.repository;
 
 import com.josef.marketbreath.model.DailyClose;
 import org.springframework.data.jpa.repository.JpaRepository;

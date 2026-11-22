@@ -2,7 +2,7 @@ package com.josef.marketbreath.service;
 
 import com.josef.marketbreath.model.DailyClose;
 import com.josef.marketbreath.model.PriceRow;
-import com.josef.marketbreath.repo.DailyCloseRepository;
+import com.josef.marketbreath.repository.DailyCloseRepository;
 
 import lombok.RequiredArgsConstructor;
 

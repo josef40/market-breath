@@ -102,6 +102,13 @@ button:focus-visible {
     padding: 0;
 }
 
+#marketTable td:first-child {
+    width: 1%;
+    white-space: nowrap;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
 .boxes {
     display: flex;
 }

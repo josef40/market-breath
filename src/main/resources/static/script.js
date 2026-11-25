@@ -1,5 +1,6 @@
 const tableBody = document.getElementById("tableBody");
 const chartsContainer = document.getElementById("charts");
+const maToggles = document.getElementById("maToggles");
 const SYMBOLS = ["SPY", "QQQ", "IWM"];
 const MA_COLORS = {
     10: "#38bdf8",
@@ -7,6 +8,13 @@ const MA_COLORS = {
     50: "#c084fc"
 };
 const charts = {};
+let lastRows = [];
+
+function getActiveMAs() {
+    return new Set(
+        Array.from(maToggles.querySelectorAll('input[type="checkbox"]:checked'), (cb) => Number(cb.value))
+    );
+}
 
 const money = (v) => "$" + Number(v).toFixed(2);
 
@@ -20,7 +28,7 @@ function box(avg, close) {
     return div;
 }
 
-function renderCharts(rows) {
+function renderCharts(rows, activeMAs) {
     const chronological = [...rows].reverse();
     const labels = chronological.map((r) => r.date);
 
@@ -56,17 +64,19 @@ function renderCharts(rows) {
                 pointRadius: 0,
                 tension: 0.2
             },
-            ...Object.entries(MA_COLORS).map(([days, color]) => ({
-                label: `${days} MA`,
-                data: chronological.map(
-                    (r) => r.signals[symbol]?.averages.find((a) => a.days === Number(days))?.value ?? null
-                ),
-                borderColor: color,
-                backgroundColor: color,
-                borderWidth: 1.5,
-                pointRadius: 0,
-                tension: 0.2
-            }))
+            ...Object.entries(MA_COLORS)
+                .filter(([days]) => activeMAs.has(Number(days)))
+                .map(([days, color]) => ({
+                    label: `${days} MA`,
+                    data: chronological.map(
+                        (r) => r.signals[symbol]?.averages.find((a) => a.days === Number(days))?.value ?? null
+                    ),
+                    borderColor: color,
+                    backgroundColor: color,
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    tension: 0.2
+                }))
         ];
 
         charts[symbol] = new Chart(canvas, {
@@ -102,7 +112,9 @@ function renderCharts(rows) {
 }
 
 function render(rows) {
-    renderCharts(rows);
+    lastRows = rows;
+    const activeMAs = getActiveMAs();
+    renderCharts(rows, activeMAs);
 
     tableBody.replaceChildren(
         ...rows.map((row) => {
@@ -121,7 +133,11 @@ function render(rows) {
 
                 const s = row.signals[symbol];
                 if (s) {
-                    wrap.append(...s.averages.map((a) => box(a, s.close)));
+                    wrap.append(
+                        ...s.averages
+                            .filter((a) => activeMAs.has(a.days))
+                            .map((a) => box(a, s.close))
+                    );
                 }
 
                 td.appendChild(wrap);
@@ -141,6 +157,8 @@ async function request(url, method = "GET") {
         alert(err.message);
     }
 }
+
+maToggles.addEventListener("change", () => render(lastRows));
 
 document.getElementById("updateButton").addEventListener("click", () => request("/prices/update", "POST"));
 document.getElementById("olderButton").addEventListener("click", () => request("/prices/older", "POST"));

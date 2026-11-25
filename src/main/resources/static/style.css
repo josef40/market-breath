@@ -40,6 +40,57 @@ main {
     gap: 1rem;
 }
 
+.ma-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.ma-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.ma-toggle:hover {
+    background-color: var(--hover);
+}
+
+.ma-toggle input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.ma-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+}
+
+.ma-dot.ma-10 {
+    background-color: #38bdf8;
+}
+
+.ma-dot.ma-20 {
+    background-color: #fbbf24;
+}
+
+.ma-dot.ma-50 {
+    background-color: #c084fc;
+}
+
 button {
     font-family: inherit;
     font-size: 1rem;
@@ -140,6 +191,7 @@ button:focus-visible {
 
 .boxes {
     display: flex;
+    min-height: 3rem;
 }
 
 .box {

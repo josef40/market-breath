@@ -161,6 +161,5 @@ async function request(url, method = "GET") {
 maToggles.addEventListener("change", () => render(lastRows));
 
 document.getElementById("updateButton").addEventListener("click", () => request("/prices/update", "POST"));
-document.getElementById("olderButton").addEventListener("click", () => request("/prices/older", "POST"));
 
 request("/prices"); // show stored data on page load

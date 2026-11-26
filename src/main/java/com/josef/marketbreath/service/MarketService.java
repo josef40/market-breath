@@ -23,6 +23,8 @@ public class MarketService {
     private static final List<String> SYMBOLS = List.of("SPY", "QQQ", "IWM");
     private static final List<Integer> PERIODS = List.of(10, 20, 50);
     private static final ZoneId NEW_YORK = ZoneId.of("America/New_York");
+    private static final int TARGET_ROWS = 100;
+    private static final int UPDATE_OUTPUT_SIZE = 30;
 
     record TimeSeries(List<Bar> values, String message) {
         record Bar(String datetime, String close) {
@@ -36,6 +38,8 @@ public class MarketService {
     private final RestClient client = RestClient.create("https://api.twelvedata.com");
 
     public List<PriceRow> getRows() {
+        ensureMinimumRows();
+
         Map<String, List<DailyClose>> bySymbol = repo.findAllByOrderByTradeDateAsc().stream()
                 .collect(Collectors.groupingBy(DailyClose::getSymbol));
 
@@ -71,22 +75,29 @@ public class MarketService {
         if (latest.isPresent() && !latest.get().getTradeDate().isBefore(lastClosedDay())) {
             return;
         }
-        fetchAndSave(null);
+        fetchAndSave(null, UPDATE_OUTPUT_SIZE);
     }
 
-    // fetch days ending the day before our oldest stored date
-    public void loadOlder() {
+    // ensure at least TARGET_ROWS trading days are stored by fetching older data if needed
+    private void ensureMinimumRows() {
+        long existing = repo.countDistinctTradeDates();
+        if (existing >= TARGET_ROWS) {
+            return;
+        }
+        int needed = (int) (TARGET_ROWS - existing);
         LocalDate endDate = repo.findTopByOrderByTradeDateAsc()
                 .map(c -> c.getTradeDate().minusDays(1))
                 .orElse(null);
-        fetchAndSave(endDate);
+        // add 1 when fetching latest in case today's unclosed bar is returned and skipped
+        int outputSize = endDate == null ? needed + 1 : needed;
+        fetchAndSave(endDate, outputSize);
     }
 
-    private void fetchAndSave(LocalDate endDate) {
+    private void fetchAndSave(LocalDate endDate, int outputSize) {
         LocalDate lastClosed = lastClosedDay();
 
         for (String symbol : SYMBOLS) {
-            TimeSeries series = fetch(symbol, endDate);
+            TimeSeries series = fetch(symbol, endDate, outputSize);
             if (series.values() == null) {
                 throw new IllegalStateException("Twelve Data: " + series.message());
             }
@@ -101,13 +112,13 @@ public class MarketService {
         }
     }
 
-    private TimeSeries fetch(String symbol, LocalDate endDate) {
+    private TimeSeries fetch(String symbol, LocalDate endDate, int outputSize) {
         return client.get()
                 .uri(b -> {
                     b.path("/time_series")
                             .queryParam("symbol", symbol)
                             .queryParam("interval", "1day")
-                            .queryParam("outputsize", 30)
+                            .queryParam("outputsize", outputSize)
                             .queryParam("apikey", key);
                     if (endDate != null) {
                         b.queryParam("end_date", endDate);

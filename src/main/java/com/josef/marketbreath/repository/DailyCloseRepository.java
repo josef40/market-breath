@@ -2,6 +2,7 @@ package com.josef.marketbreath.repository;
 
 import com.josef.marketbreath.model.DailyClose;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,4 +17,7 @@ public interface DailyCloseRepository extends JpaRepository<DailyClose, Long> {
     Optional<DailyClose> findTopByOrderByTradeDateDesc();
 
     Optional<DailyClose> findTopByOrderByTradeDateAsc();
+
+    @Query("select count(distinct d.tradeDate) from DailyClose d")
+    long countDistinctTradeDates();
 }

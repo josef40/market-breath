@@ -25,10 +25,4 @@ public class MarketController {
         service.update();
         return service.getRows();
     }
-
-    @PostMapping("/older")
-    public List<PriceRow> older() {
-        service.loadOlder();
-        return service.getRows();
-    }
 }

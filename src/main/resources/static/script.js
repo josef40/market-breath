@@ -7,8 +7,32 @@ const MA_COLORS = {
     20: "#fbbf24",
     50: "#c084fc"
 };
+const MA_STORAGE_KEY = "marketBreath.activeMAs";
 const charts = {};
 let lastRows = [];
+
+function loadSavedMAs() {
+    try {
+        const raw = localStorage.getItem(MA_STORAGE_KEY);
+        if (raw === null) return;
+        const saved = JSON.parse(raw);
+        if (!Array.isArray(saved)) return;
+        const active = new Set(saved.map(Number));
+        maToggles.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+            cb.checked = active.has(Number(cb.value));
+        });
+    } catch {
+        // Ignore storage/parse errors and fall back to HTML defaults
+    }
+}
+
+function saveActiveMAs() {
+    try {
+        localStorage.setItem(MA_STORAGE_KEY, JSON.stringify([...getActiveMAs()]));
+    } catch {
+        // Ignore storage errors (e.g. private browsing quota)
+    }
+}
 
 function getActiveMAs() {
     return new Set(
@@ -158,8 +182,12 @@ async function request(url, method = "GET") {
     }
 }
 
-maToggles.addEventListener("change", () => render(lastRows));
+maToggles.addEventListener("change", () => {
+    saveActiveMAs();
+    render(lastRows);
+});
 
 document.getElementById("updateButton").addEventListener("click", () => request("/prices/update", "POST"));
 
+loadSavedMAs();
 request("/prices"); // show stored data on page load
